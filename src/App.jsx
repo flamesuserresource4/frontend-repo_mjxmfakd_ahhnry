@@ -1,28 +1,55 @@
-import { useState } from 'react'
+import React, { useState } from 'react';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import GameGrid from './components/GameGrid';
+import TopUpForm from './components/TopUpForm';
+import CartDrawer from './components/CartDrawer';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cart, setCart] = useState([]);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [gameName, setGameName] = useState('');
+
+  const handleSelectGame = (id, name) => {
+    setSelectedGame(id);
+    setGameName(name);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const handleAddToCart = (item) => {
+    setCart((prev) => [...prev, item]);
+    setCartOpen(true);
+  };
+
+  const handleRemoveItem = (idx) => {
+    setCart((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleCheckout = (total) => {
+    alert(`Demo checkout — total: $${total.toFixed(2)}. Integrate payment gateway in backend.`);
+    setCart([]);
+    setCartOpen(false);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-violet-50 to-fuchsia-50">
+      <Navbar cartCount={cart.length} onCartClick={() => setCartOpen(true)} />
+      <Hero />
+      <GameGrid onSelect={handleSelectGame} />
+      <TopUpForm selectedGame={selectedGame} gameName={gameName} onAddToCart={handleAddToCart} />
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        items={cart}
+        onRemove={handleRemoveItem}
+        onCheckout={handleCheckout}
+      />
+      <footer className="py-10 text-center text-slate-600 text-sm">
+        © {new Date().getFullYear()} TopUp Nexus — All rights reserved.
+      </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
